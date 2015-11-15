@@ -2,18 +2,16 @@
   "images" : [
     {
       "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "LED Diode-25.png"
+      "scale" : "1x"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "LED Diode-50-2.png"
+      "filename" : "makey.png"
     },
     {
       "idiom" : "universal",
-      "scale" : "3x",
-      "filename" : "LED Diode-100.png"
+      "scale" : "3x"
     }
   ],
   "info" : {

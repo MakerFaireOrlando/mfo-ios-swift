@@ -8,11 +8,12 @@
 
 import Foundation
 
-class Event {
+class Event : NSObject {
     
     var name:String?
+    var image_medium:String?
     var image_large:String?
-    var description:String?
+    var event_description:String?
     var date:String?
     var start_time:String?
     var end_time:String?
@@ -22,20 +23,22 @@ class Event {
     var location:String?
     
     init(
-    name:String?,
-    image_large:String?,
-    description:String?,
-    date:String?,
-    start_time:String?,
-    end_time:String?,
-    duration:String?,
-    cost:String?,
-    additional_info:String?,
-    location:String?)
+        name:String?,
+        image_large:String?,
+        image_medium:String?,
+        description:String?,
+        date:String?,
+        start_time:String?,
+        end_time:String?,
+        duration:String?,
+        cost:String?,
+        additional_info:String?,
+        location:String?)
     {
         self.name = name
         self.image_large = image_large
-        self.description = description
+        self.image_medium = image_medium
+        self.event_description = description
         self.date = date
         self.start_time = start_time
         self.end_time = end_time

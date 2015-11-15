@@ -14,9 +14,6 @@ protocol EventAPIProtocol {
 
 class EventAPI {
     
-    // Your API key here
-    let eventAPIKey: String = "AIzaSyApmGbYssXVQ0_BM-UyC7UiVvfO6AS9soo"
-    
     var delegate: EventAPIProtocol?
     
     init(delegate: EventAPIProtocol?) {
@@ -24,7 +21,6 @@ class EventAPI {
     }
     
     func getEvents() {
-        // let urlPath = "https://www.googleapis.com/calendar/v3/calendars/orlandominimakerfaire.com_vffhp2b6oi3kiu3trnoo1502hg@group.calendar.google.com/events?key="
         let urlPath = "http://www.makerfaireorlando.com/events-json"
         // let url: NSURL? = NSURL(string: urlPath + eventAPIKey)
         let url: NSURL? = NSURL(string: urlPath)

@@ -11,7 +11,9 @@ import UIKit
 class EventViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, EventAPIProtocol {
     
     @IBOutlet weak var daySegmentedControl: UISegmentedControl!
+
     let kCellIdentifier: String = "EventCell"
+    var refreshControl:UIRefreshControl!
     
     var api: EventAPI?
     
@@ -20,6 +22,9 @@ class EventViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     var events: [[Event]] = [[]]
     
+
+    let indicator:UIActivityIndicatorView = UIActivityIndicatorView  (activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -27,6 +32,27 @@ class EventViewController: UIViewController, UITableViewDataSource, UITableViewD
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         self.api?.getEvents()
         self.daySegmentedControl.addTarget(self, action: Selector("handleSegment:"), forControlEvents: UIControlEvents.ValueChanged)
+        
+        self.refreshControl = UIRefreshControl()
+        self.refreshControl.tintColor = UIColor.redColor()
+        //self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        self.refreshControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
+        self.eventTableView.addSubview(refreshControl)
+        
+        
+        
+        indicator.color = UIColor.redColor()
+        indicator.frame = CGRectMake(0.0, 0.0, 36.0, 36.0)
+        indicator.center = self.view.center
+        self.view.addSubview(indicator)
+        indicator.bringSubviewToFront(self.view)
+        indicator.startAnimating()
+        
+    }
+    
+    func refresh(sender:AnyObject)
+    {
+        self.api?.getEvents()
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,13 +71,16 @@ class EventViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         let event = self.events[daySegmentedControl.selectedSegmentIndex][indexPath.row]
         cell.textLabel!.text = event.name
-        cell.detailTextLabel!.text = event.location
-        
+        if event.end_time != "" {
+            cell.detailTextLabel!.text = (event.start_time ?? "") + " - " + (event.end_time ?? "")
+        } else {
+            cell.detailTextLabel!.text = event.start_time
+        }
         return cell
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
-        var detailViewController: EventDetailViewController = segue.destinationViewController as! EventDetailViewController
+        var detailViewController: EventDetailTableViewController = segue.destinationViewController as! EventDetailTableViewController
         var eventIndex = eventTableView.indexPathForSelectedRow()!.row
         var selectedEvent = self.events[daySegmentedControl.selectedSegmentIndex][eventIndex]
         detailViewController.event = selectedEvent
@@ -59,8 +88,14 @@ class EventViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func didReceiveAPIResults(results: NSDictionary) {
+        self.refreshControl.endRefreshing()
+        indicator.stopAnimating()
+        
         let days: NSArray = results["days"] as! NSArray
-        self.events.append([Event]())
+        
+        var newEvents: [[Event]] = [[]]
+        
+        newEvents.append([Event]())
         let count = days.count - 1
         for dayCounter in 0...count {
             let day: NSDictionary = days[dayCounter] as! NSDictionary
@@ -74,6 +109,7 @@ class EventViewController: UIViewController, UITableViewDataSource, UITableViewD
                 
                 var name: String? = e["name"] as? String
                 var image_large: String? = e["image_large"] as? String
+                var image_medium: String? = e["image_medium"] as? String
                 var description: String? = e["description"] as? String
                 var date: String? = e["date"] as? String
                 var start_time: String? = e["start_time"] as? String
@@ -96,42 +132,13 @@ class EventViewController: UIViewController, UITableViewDataSource, UITableViewD
 */
                 
                 //var newEvent = Event(summary: summary, event_description: event_description, location: location, link: link, start: start, end: end)
-                var newEvent = Event(name: name, image_large: image_large, description: description, date: date, start_time: start_time, end_time: end_time, duration: duration, cost: cost, additional_info: additional_info, location: location)
-                println(newEvent)
+                var newEvent = Event(name: name, image_large: image_large, image_medium: image_medium, description: description, date: date, start_time: start_time, end_time: end_time, duration: duration, cost: cost, additional_info: additional_info, location: location)
                 
-                self.events[dayCounter].append(newEvent)
+                newEvents[dayCounter].append(newEvent)
             }
         }
         
-//        let allResults: [NSDictionary] = results["items"] as! [NSDictionary]
-//        for result:NSDictionary in allResults {
-//            
-//            var location: String? = result["location"] as? String
-//            var link: String? = result["htmllink"] as? String
-//            var event_description: String? = result["description"] as? String
-//            var summary: String? = result["summary"] as? String
-//            
-//            
-//            var formatter: NSDateFormatter = NSDateFormatter()
-//            formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'-'HH':'mm'"
-//            var startDict : NSDictionary = result["start"] as! NSDictionary
-//            var endDict : NSDictionary = result["end"] as! NSDictionary
-//            
-//            var startString : String = startDict["dateTime"] as! String
-//            var endString : String = endDict["dateTime"] as! String
-//            
-//            println(startString)
-//            
-//            var start: NSDate = formatter.dateFromString(startString)!
-//            var end: NSDate = formatter.dateFromString(endString)!
-//            println(start)
-//            
-//            
-//            var newEvent = Event(summary: summary, event_description: event_description, location: location, link: link, start: start, end: end)
-//            
-//            self.events.append(newEvent)
-//        }
-//       
+        self.events = newEvents
         self.eventTableView.reloadData()
         UIApplication.sharedApplication().networkActivityIndicatorVisible = false
     }

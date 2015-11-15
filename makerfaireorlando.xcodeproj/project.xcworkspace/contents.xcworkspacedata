@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Maker Faire Orlando.xcodeproj">
+      location = "self:/Users/cbrooks/develop/Maker-Faire-Orlando-iOS/makerfaireorlando.xcodeproj">
    </FileRef>
 </Workspace>

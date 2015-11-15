@@ -21,7 +21,7 @@ class MakerAPI {
     }
     
     func getMakers() {
-        let urlPath = "http://callformakers.org/orlando2014/default/overviewALL.json/raw"
+        let urlPath = "http://makerfaireorlando.com/makers-json"
         let url: NSURL = NSURL(string: urlPath)!
         let request: NSURLRequest = NSURLRequest(URL: url)
         
